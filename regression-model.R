@@ -19,16 +19,20 @@ get.lm.coeffs <- function(use.emos) {
   coefs.matrix.simex.alpha.2d <- matrix(0,nrow=7, ncol=4)
   coefs.matrix.simex.sem.2d <- matrix(0,nrow=7, ncol=4)
   
+  coefs.matrix2.normal <- matrix(0,nrow=7, ncol=4)
+  coefs.matrix2.simex.sem <- matrix(0,nrow=7, ncol=4)
+  
   coefs.matrix.simex.sem.regularized <- matrix(0,nrow=7, ncol=4)  
 
 for(t in 1:4) {
 simex.var <- emos[use.emos]
 select <- use.emos + 3
-
 emotions.1 <- emotions[emotions$time==t,c(1,2,3,select)]
+emotions.2 <- emotions[emotions$time==(t+1),c(1,2,3,select)]
 #to.use <- na.omit(emotions.1[,c(1,2,(i+3))])
   
  to.use.scale <- emotions.1[,-3]
+to.use.scale2 <- emotions.2[,-3]
   var.whole <<- apply(to.use.scale[-c(1,2)],var,MARGIN=2)
 #  to.use.scale[,3:dim(to.use.scale)[2]] <- scale(to.use.scale[,3:dim(to.use.scale)[2]])
 
@@ -37,8 +41,17 @@ var.score <- var.whole - alpha.errors[use.emos,t]^2
  # new.est <- (simex.linear.model.pca) %*% (t(pca.to.use$loadings))
   sd <- sqrt(var(emotions.1$y))
   
-  
+ 
   linear.model <- lm(y ~ .,data=to.use.scale)
+
+dep.emotions <- scale(to.use.scale[,3]) 
+colnames(dep.emotions) <-  emos[use.emos[1]]
+  if(t<4) {
+    #:dim(to.use.scale2)[2]
+    new.frame <- data.frame(cbind(scale(to.use.scale2[,3]), dep.emotions, to.use.scale[,2]))
+    colnames(new.frame) <- c("y",emos[use.emos[1]],"y_before")
+  linear.model2 <- lm(y~.,data=new.frame)
+  }
 #sems[i] <- 0.069
   sem.corrected <- alpha.errors[use.emos,t]
   sem2.corrected <- sem2[use.emos]
@@ -60,7 +73,10 @@ var.score <- var.whole - alpha.errors[use.emos,t]^2
  # new.est <- coef(simex.linear.model.pca )[-1] %*% (t(pca.to.use$loadings))
 simex.linear.model.alpha <<- simex(model=linear.model, SIMEXvariable=simex.var,measurement.error = t(as.matrix(sem.corrected)), asymptotic=F)
 simex.linear.model.sem <<- simex(model=linear.model, SIMEXvariable=simex.var, measurement.error = t(as.matrix(sem2.corrected)), asymptotic=F)
-  
+
+#simex.linear.model.alpha2 <<- simex(model=linear.model2, SIMEXvariable=simex.var,measurement.error = t(as.matrix(sem.corrected)), asymptotic=F)
+simex.linear.model.sem2 <<- simex(model=linear.model2, SIMEXvariable=simex.var[1], measurement.error = t(as.matrix(sem2.corrected))[,1], asymptotic=F)
+
 #  start=coef(simex.linear.model.sem )
 #  goal=coef(linear.model)
 #  sd=sd(linear.model$residuals)
@@ -95,6 +111,9 @@ simex.linear.model.sem <<- simex(model=linear.model, SIMEXvariable=simex.var, me
  #   coefs.matrix.simex.alpha.2d[use.emos[a],t] <- simex.linear.model.alpha.2d$coef[c]
 #    coefs.matrix.simex.sem.2d[use.emos[a],t] <- simex.linear.model.sem.2d$coef[c]
     coefs.matrix.simex.fit[use.emos[a],t] <- simex.linear.model.fit[c]*sqrt(var.score[a])
+    
+    coefs.matrix2.normal[1,t] <- linear.model2$coef[2]
+    coefs.matrix2.simex.sem[1,t]  <- simex.linear.model.sem2$coef[2]
     #coefs.matrix.simex.pca[use.emos[a],t]  <-new.est[c]
   }
   
@@ -120,5 +139,11 @@ rownames(coefs.matrix.simex.alpha) <- emos
   coefs.matrix.simex.sem<<- coefs.matrix.simex.sem
 
   coefs.matrix.simex.fit<<-coefs.matrix.simex.fit
+  
+  
+  coefs.matrix2.normal <<- coefs.matrix2.normal
+  
+  coefs.matrix2.simex.sem <<-  coefs.matrix2.simex.sem
+  
 }
 

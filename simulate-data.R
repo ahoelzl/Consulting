@@ -207,7 +207,15 @@ data.o.cov <- function() {
     lm(grades[,4] ~ all.scores3.theor + grades[,3])
     lm(grades[,5] ~ all.scores4.theor + grades[,4])
     
+    
+    t1 <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[2,1]
+    t2 <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[2,1]
+    t3 <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[2,1]
+
+   standardized.values2 <<- c(t1,t2,t3)
+    
    su<-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
+    all.scores1.actual <-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
     all.scores2.actual <-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
     all.scores3.actual <-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
     all.scores4.actual <-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
@@ -241,6 +249,7 @@ data.o.cov <- function() {
       sc2 <- all.scores2.theor [,r]
       sc3 <- all.scores3.theor [,r]
       sc4 <- all.scores4.theor[,r] 
+      sc5 <- all.scores5.theor[,r] 
       
       item.matrix <- matrix(0,nrow=length(sc1),ncol=dim(loading)[2])
       
@@ -272,6 +281,10 @@ data.o.cov <- function() {
       all.scores4.actual[,r] <- scale(apply(items.errors[,emo4], sum,MARGIN=1))
       
       
+      t1 <- lm( all.scores2.actual  ~ all.scores1.actual + grades[,1])$coef
+      t2 <- lm( all.scores3.actual  ~ all.scores2.actual + grades[,2])$coef
+      t3 <- lm( all.scores4.actual  ~ all.scores3.actual + grades[,3])$coef
+      
       
       if(r == 1) {
         all.error.items <- items.errors
@@ -286,6 +299,14 @@ data.o.cov <- function() {
     lm(grades[,3] ~ all.scores2.actual + grades[,2])
     lm(grades[,4] ~ all.scores3.actual + grades[,3])
     lm(grades[,5] ~ all.scores4.actual + grades[,4])
+    
+    lm(grades[,2] ~ scale(all.scores1.actual) + grades[,1])
+    lm(grades[,2] ~ scale(all.scores1.theor) + grades[,1])
+    
+    
+    
+    lm( scale(all.scores2.actual) ~ scale(all.scores1.actual) + grades[,1])
+    lm( scale(all.scores2.theor) ~ scale(all.scores1.theor) + grades[,1])
     
     var.ges <- apply(all.scores1.actual ,FUN=var, MARGIN=2)
     var.score <- apply(all.scores1.theor ,FUN=var, MARGIN=2)

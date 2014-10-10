@@ -157,6 +157,10 @@ get.lm.coeffs(vars)
 #coefs.matrix.simex.alpha
 #coefs.matrix.simex.sem
 #coefs.matrix.simex.pca
+#coefs.matrix2.normal
+#coefs.matrix2.simex.sem
+
+
 if(s < 4) {
 sem.one.variable(vars, correlation=F)
 }
