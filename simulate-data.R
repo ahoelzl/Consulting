@@ -202,17 +202,31 @@ data.o.cov <- function() {
     
     }
     
-    lm(grades[,2] ~ all.scores1.theor + grades[,1])
-    lm(grades[,3] ~ all.scores2.theor + grades[,2])
-    lm(grades[,4] ~ all.scores3.theor + grades[,3])
-    lm(grades[,5] ~ all.scores4.theor + grades[,4])
+   print( lm(grades[,2] ~ all.scores1.theor + grades[,1]))
+    print(lm(grades[,3] ~ all.scores2.theor + grades[,2]))
+    print(lm(grades[,4] ~ all.scores3.theor + grades[,3]))
+    print(lm(grades[,5] ~ all.scores4.theor + grades[,4]))
     
+    if(length(vars.to.use) > 1) {
+    t1 <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[3,1]
+    t2 <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[3,1]
+    t3 <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[3,1]
     
-    t1 <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[2,1]
-    t2 <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[2,1]
-    t3 <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[2,1]
-
-   standardized.values2 <<- c(t1,t2,t3)
+    t1.auto <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[2,1]
+    t2.auto <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[2,1]
+    t3.auto <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[2,1]
+    } else {
+      t1 <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[3]
+      t2 <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[3]
+      t3 <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[3]
+      
+      t1.auto <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[2]
+      t2.auto <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[2]
+      t3.auto <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[2]
+    }
+    
+    standardized.values2 <<- c(t1,t2,t3)
+    standardized.values2.auto <<- c(t1.auto,t2.auto,t3.auto)
     
    su<-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
     all.scores1.actual <-  matrix(1,ncol=length(vars.to.use),nrow=dim(data.o)[1])
@@ -317,7 +331,7 @@ data.o.cov <- function() {
     sd.score3 <- apply((all.scores3.actual -  all.scores3.theor),FUN=sd, MARGIN=2)
     sd.score4 <- apply((all.scores4.actual -  all.scores4.theor),FUN=sd, MARGIN=2)
     
-    true.error.scores <<- cbind(sd.score1,sd.score2,sd.score3,sd.score4,sd.score5)
+    true.error.scores <<- cbind(sd.score1,sd.score2,sd.score3,sd.score4)
     #all.error.items
     # all.scores1.theor
     
@@ -341,23 +355,32 @@ data.o.cov <- function() {
     colnames(grades_all) <- c("gma_jz5", "gma_jz6", "gma_jz7", "gma_jz8","gma_jz9")
     
     data <- na.omit(as.data.frame(cbind(all.error.items, grades_all)))
-    standardized.values <<- standardized.values
+   
     
     data2 <- data
     
     standardized.values <- matrix(theoretical.values[vars.to.use,], ncol=4)
-    
+    standardized.values.auto <- matrix(theoretical.values[vars.to.use,], ncol=4)
     standardized.values[,1] <- (theoretical.values[vars.to.use,1]*  apply(all.scores1.theor, FUN=sd,MARGIN=2))
     standardized.values[,2] <- (theoretical.values[vars.to.use,2]*  apply(all.scores2.theor, FUN=sd,MARGIN=2))
     standardized.values[,3] <- (theoretical.values[vars.to.use,3]*  apply(all.scores3.theor, FUN=sd,MARGIN=2))
     standardized.values[,4] <- (theoretical.values[vars.to.use,4]*  apply(all.scores4.theor, FUN=sd,MARGIN=2))
     
+    
+    standardized.values.auto[,1] <- (theoretical.values2[vars.to.use,1]*  apply(all.scores1.theor, FUN=sd,MARGIN=2))
+    standardized.values.auto[,2] <- (theoretical.values2[vars.to.use,2]*  apply(all.scores2.theor, FUN=sd,MARGIN=2))
+    standardized.values.auto[,3] <- (theoretical.values2[vars.to.use,3]*  apply(all.scores3.theor, FUN=sd,MARGIN=2))
+    standardized.values.auto[,4] <- (theoretical.values2[vars.to.use,4]*  apply(all.scores4.theor, FUN=sd,MARGIN=2))
+    
+    
     standardized.values <<-  standardized.values
+    standardized.values.auto <<-  standardized.values.auto
+    
 
-   print( lm(grades[,2] ~ scale(apply(data[,emo1], sum,MARGIN=1)) + grades[,1]))
-   print(  lm(grades[,3] ~ scale(apply(data[,emo2], sum,MARGIN=1))+ grades[,2]))
-   print(  lm(grades[,4] ~scale(apply(data[,emo3], sum,MARGIN=1)) + grades[,3]))
-    print(  lm(grades[,5] ~ scale(apply(data[,emo4], sum,MARGIN=1)) + grades[,4]))
+   print( lm(grades_all[,2] ~ scale(apply(data[,emo1], sum,MARGIN=1)) + grades_all[,1]))
+   print(  lm(grades_all[,3] ~ scale(apply(data[,emo2], sum,MARGIN=1))+ grades_all[,2]))
+   print(  lm(grades_all[,4] ~scale(apply(data[,emo3], sum,MARGIN=1)) + grades_all[,3]))
+    print(  lm(grades_all[,5] ~ scale(apply(data[,emo4], sum,MARGIN=1)) + grades_all[,4]))
     
     
     

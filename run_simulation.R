@@ -156,11 +156,18 @@ get.lm.coeffs(vars)
 #coefs.matrix.normal
 #coefs.matrix.simex.alpha
 #coefs.matrix.simex.sem
-#coefs.matrix.simex.pca
 #coefs.matrix2.normal
 #coefs.matrix2.simex.sem
-
-
+#coefs.matrix.normal.auto
+#coefs.matrix.simex.alpha.auto
+#coefs.matrix.simex.sem.auto
+#coefs.matrix2.normal.auto
+#coefs.matrix2.simex.sem.auto
+###richtig:
+###standardized.values 
+###standardized.values2
+##standardized.values.auto
+###standardized.values2.auto
 if(s < 4) {
 sem.one.variable(vars, correlation=F)
 }
@@ -172,26 +179,44 @@ diff.matrix.normal <- mean(abs(coefs.matrix.normal[vars,] - standardized.values)
 diff.matrix.simex.alpha <- mean(abs(coefs.matrix.simex.alpha[vars,] - standardized.values))
 diff.matrix.simex.sem <- mean(abs(coefs.matrix.simex.sem[vars,] - standardized.values))
 diff.matrix.sem <- mean(abs(coefs.matrix.sem[vars,] - standardized.values))
-#diff.matrix.simex.alpha.2d <- mean(abs(coefs.matrix.simex.alpha.2d[vars,] - theoretical.coeffs[vars,]))
-#diff.matrix.simex.sem.2d <- mean(abs(coefs.matrix.simex.sem.2d[vars,] - theoretical.coeffs[vars,]))
-#diff.matrix.pca <- mean(abs(coefs.matrix.simex.pca[vars,] - theoretical.coeffs[vars,]))
 
-#diff.matrix.fit <- mean(abs(coefs.matrix.simex.fit[vars,] - theoretical.coeffs[vars,]))
+diff2.normal <-     mean(abs(coefs.matrix2.normal[1,1:3] - standardized.values2))
+diff2.alpha <-   mean(abs(coefs.matrix2.simex.alpha[1,1:3]  - standardized.values2))
+diff2.sem <-   mean(abs(coefs.matrix2.simex.sem[1,1:3]  - standardized.values2))
+
+diff.normal.auto <- mean(abs(coefs.matrix.normal.auto[vars,] - standardized.values.auto))
+diff.alpha.auto <- mean(abs( coefs.matrix.simex.alpha.auto[vars,] - standardized.values.auto))
+diff.sem.auto <- mean(abs( coefs.matrix.simex.sem.auto[vars,] - standardized.values.auto))
+
+diff2.normal.auto <- mean(abs(coefs.matrix2.normal.auto[1,1:3] - standardized.values2.auto))
+diff2.alpha.auto <- mean(abs( coefs.matrix2.simex.alpha.auto[1,1:3] - standardized.values2.auto))
+diff2.sem.auto <- mean(abs( coefs.matrix2.simex.sem.auto[1,1:3] - standardized.values2.auto))
+
 
 bias.normal <- mean(abs(coefs.matrix.normal[vars,]) - abs( standardized.values))
 bias.simex.alpha <- mean(abs(coefs.matrix.simex.alpha[vars,]) - abs(standardized.values))
 bias.simex.sem <- mean(abs(coefs.matrix.simex.sem[vars,]) - abs( standardized.values))
-#bias.simex.pca <- mean(abs(coefs.matrix.simex.pca[vars,]) - abs(theoretical.coeffs[vars,]))
 bias.matrix.sem <- mean(abs(coefs.matrix.sem[vars,]) - abs(standardized.values))
-#bias.matrix.fit <- mean(abs(coefs.matrix.simex.fit[vars,]) - abs(theoretical.coeffs[vars,]))
+
 
 print("-------------")
 print(diff.matrix.normal)
 print(diff.matrix.simex.alpha)
 print(diff.matrix.simex.sem)
 print(diff.matrix.sem)
-#print(diff.matrix.pca)
-#print(diff.matrix.fit)
+
+
+print(diff2.normal)
+print(diff2.alpha)
+print(diff2.sem)
+
+print(diff.normal.auto)
+print(diff.alpha.auto)
+print(diff.sem.auto)
+
+print(diff2.normal.auto)
+print(diff2.alpha.auto)
+print(diff2.sem.auto)
 
 print(bias.normal)
 print(bias.simex.alpha)

@@ -52,7 +52,7 @@ for(r in 1:length(emotions)) {
   emo2 <- sort(emo2)
   emo3 <- sort(emo3)
   emo4 <- sort(emo4)
-  
+  emo5 <- sort(emo5)
   
   all.info <-  ""
   new.info <- ""
@@ -88,6 +88,13 @@ for(r in 1:length(emotions)) {
       new.info <- paste0(new.info, emo4[e]," ~~ ", emo4[f], " \n ")
     }
   }
+  
+  new.info <- ""
+  for(e in 1:length(emo5)) {
+    for(f in 1:(e)) {
+      new.info <- paste0(new.info, emo5[e]," ~~ ", emo5[f], " \n ")
+    }
+  }
  
   all.info <- paste0(all.info, new.info)
   
@@ -95,7 +102,8 @@ for(r in 1:length(emotions)) {
   for(u in 1:length(emo1)) {
     final.info <- paste0(final.info, emo1[u], " ~~ ", emo2[u], " \n ")
     final.info <- paste0(final.info, emo2[u], " ~~ ", emo3[u], " \n ")
-    final.info <- paste0(final.info, emo3[u], " ~~ ", emo4[u], " \n ")
+    final.info <- paste0(final.info, emo3[u], " ~~ ", emo4[u], " \n ",
+    final.info <- paste0(final.info, emo4[u], " ~~ ", emo5[u], " \n ")
   }
   
   all.info <- paste0(all.info, final.info)
@@ -103,7 +111,8 @@ for(r in 1:length(emotions)) {
   model.text <- paste0(model.text, " \n ",  "emo",index,"_1 =~ ", write.as.sum(emo1)," \n ",
                        "emo",index,"_2 =~ ", write.as.sum(emo2)," \n ",
                        "emo",index,"_3 =~ ",write.as.sum(emo3)," \n ",
-                       "emo",index,"_4 =~ ",write.as.sum(emo4)," \n ")
+                       "emo",index,"_4 =~ ",write.as.sum(emo4)," \n ",
+                       "emo",index,"_5 =~ ",write.as.sum(emo5)," \n ")
 
 }
   
@@ -119,6 +128,7 @@ t4 <- "gma_jz9 ~  gma_jz8"
     t2<- paste0(t2, " + emo",r,"_2"," \n ")
     t3 <- paste0(t3, " + emo",r,"_3"," \n ")
     t4 <- paste0(t4, " + emo",r,"_4"," \n ")
+    t5 <- paste0(t4, " + emo",r,"_5"," \n ")
   }
 
 even.more.info <- ""
@@ -129,6 +139,7 @@ for(r in  1:length(to.use.emos)) {
  even.more.info <- paste0(even.more.info, " emo",r,"_2 ~~ emo ",u,"_2 \n" )
  even.more.info <- paste0(even.more.info, " emo",r,"_3 ~~ emo ",u,"_3 \n" )
  even.more.info <- paste0(even.more.info, " emo",r,"_4 ~~ emo ",u,"_4 \n" )
+ even.more.info <- paste0(even.more.info, " emo",r,"_5 ~~ emo ",u,"_5 \n" )
     }
   }
 }
@@ -142,7 +153,10 @@ model <- paste0(model.text, t1,t2,t3,t4)
 #model <- paste0(model.text, t1,t2,t3,t4)
 model.save <<- model
 
-fit <- lavaan::sem(model, data = na.omit(data.partial), mimic="MPLUS", meanstructure=T, std.lv=T)
+
+da <- apply(na.omit(data.partial),as.numeric,MARGIN=c(1,2))
+
+fit <- lavaan::sem(model, data = da, mimic="MPLUS", meanstructure=T, std.lv=T)
 
 #predict(fit)
 
