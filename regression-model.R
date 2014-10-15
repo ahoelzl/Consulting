@@ -157,9 +157,11 @@ rownames(coefs.matrix.simex.alpha) <- emos
   
   
   coefs.matrix2.normal.auto <<- coefs.matrix2.normal.auto
+  coefs.matrix2.simex.alpha.auto <<- coefs.matrix2.simex.alpha.auto
   coefs.matrix2.simex.sem.auto <<-  coefs.matrix2.simex.sem.auto
   
   coefs.matrix.normal.auto <<- coefs.matrix.normal.auto 
+  coefs.matrix.simex.alpha.auto <<- coefs.matrix.simex.alpha.auto
   coefs.matrix.simex.sem.auto <<- coefs.matrix.simex.sem.auto
   
 }

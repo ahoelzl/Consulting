@@ -106,7 +106,7 @@ b.simex.alpha <- c()
 b.simex.sem <- c()
 b.sem <- c()  
 
-for(s in 1:4) {
+for(s in 1:2) {
   varlist <- list()
   if(s == 1) {
     varlist <- list.one
@@ -120,8 +120,8 @@ for(s in 1:4) {
     varlist <- list.seven
   }
   
-  var.factor <- c(0.1,0.5,1,1.5,2)
-  regression.error <- c(0.2,0.5,1,1.2)
+  var.factor <- c(0.5,1,2)
+  regression.error <- c(0.1,0.2)
   
   for(r.error in regression.error) {
     
@@ -140,10 +140,12 @@ variance <- var.factor[b2]
       b.simex.sem <- c()
       b.sem <- c()  
       
+resultmatrix <- matrix(0, nrow=4, ncol=length(varlist))
+biasmatrix <-  matrix(0, nrow=4, ncol=length(varlist))
 for(index in 1:length(varlist)) {
 vars <-varlist[[index]]
 
-data <- data2 <- simulate.data2(vars, measurement.corrs=T, var.factor=variance, regression.error = r.error) 
+data <- data2 <- simulate.data2(vars, measurement.corrs=F, var.factor=variance, regression.error = r.error) 
 # true.error.scores 
 #actual_grades
 #actual_scores
@@ -169,7 +171,7 @@ get.lm.coeffs(vars)
 ##standardized.values.auto
 ###standardized.values2.auto
 if(s < 4) {
-sem.one.variable(vars, correlation=F)
+#sem.one.variable(vars, correlation=F)
 }
 #coefs.matrix.sem
 #coefs.matrix.simex.fit
@@ -185,7 +187,7 @@ diff2.alpha <-   mean(abs(coefs.matrix2.simex.alpha[1,1:3]  - standardized.value
 diff2.sem <-   mean(abs(coefs.matrix2.simex.sem[1,1:3]  - standardized.values2))
 
 diff.normal.auto <- mean(abs(coefs.matrix.normal.auto[vars,] - standardized.values.auto))
-diff.alpha.auto <- mean(abs( coefs.matrix.simex.alpha.auto[vars,] - standardized.values.auto))
+#diff.alpha.auto <- mean(abs( coefs.matrix.alpha.auto[vars,] - standardized.values.auto))
 diff.sem.auto <- mean(abs( coefs.matrix.simex.sem.auto[vars,] - standardized.values.auto))
 
 diff2.normal.auto <- mean(abs(coefs.matrix2.normal.auto[1,1:3] - standardized.values2.auto))
@@ -211,11 +213,11 @@ print(diff2.alpha)
 print(diff2.sem)
 
 print(diff.normal.auto)
-print(diff.alpha.auto)
+#print(diff.alpha.auto)
 print(diff.sem.auto)
 
 print(diff2.normal.auto)
-print(diff2.alpha.auto)
+#print(diff2.alpha.auto)
 print(diff2.sem.auto)
 
 print(bias.normal)
@@ -232,31 +234,36 @@ v.simex.alpha[v] <- diff.matrix.simex.alpha
 v.simex.sem[v] <- diff.matrix.simex.sem 
 v.sem[v] <- diff.matrix.sem
 
+print(v.normal)
+print(v.simex.alpha)
+print(v.simex.sem)
+print(v.sem)
 
 b.normal[v] <- bias.normal 
+
 b.simex.alpha[v] <- bias.simex.alpha
 b.simex.sem[v] <- bias.simex.sem 
 b.sem[v] <- bias.matrix.sem
+
+resultmatrix[1, v] <- diff.matrix.normal
+resultmatrix[2, v] <-diff.matrix.simex.alpha
+resultmatrix[3, v] <-diff.matrix.simex.sem 
+resultmatrix[4, v] <-  diff.matrix.sem
+
+write.table(resultmatrix, file=paste0(getwd(),"/results/numberemos",s,"rerror",r.error," variance ", variance ))
+
 }
       
-      resultmatrix[b2, 1] <- mean(v.normal)
-      resultmatrix[b2, 2] <- mean(v.simex.alpha)
-      resultmatrix[b2, 3] <- mean(b.simex.sem)
-      resultmatrix[b2, 4] <- mean(v.sem)
+
       
-      biasmatrix[b2, 1] <- mean(b.normal)
-      biasmatrix[b2, 2] <- mean(b.simex.alpha)
-      biasmatrix[b2, 3] <- mean(b.simex.sem)
-      biasmatrix[b2, 4] <- mean(b.sem)
+   #   colnames(biasmatrix) <- c("normal", "simex-alpha","simex-sem","sem")
+  #    rownames(biasmatrix) <- var.factor
       
-      colnames(biasmatrix) <- c("normal", "simex-alpha","simex-sem","sem")
-      rownames(biasmatrix) <- var.factor
-      
-      colnames(resultmatrix) <- c("normal", "simex-alpha","simex-sem","sem")
-      rownames(resultmatrix) <- var.factor
+  #    colnames(resultmatrix) <- c("normal", "simex-alpha","simex-sem","sem")
+  #    rownames(resultmatrix) <- var.factor
       
 
-      write.table(resultmatrix, file=paste0(getwd(),"/results/numberemos",s,"rerror",r.error ))
+    
      
 
 }

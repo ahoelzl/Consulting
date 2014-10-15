@@ -73,17 +73,17 @@ sem_hl <- read.data.measurement.error("hl")
 } else {
   sem_hl  <- 0
 }
-if(4 %in% vars) {
+if(5 %in% vars) {
 sem_bo <- read.data.measurement.error("bo")
 } else {
   sem_bo  <- 0
 }
-if(5 %in% vars) {
+if(6 %in% vars) {
 sem_sh <- read.data.measurement.error("sh")
 } else {
   sem_sh  <- 0
 }
-if(6 %in% vars) {
+if(7 %in% vars) {
 sem_pr <- read.data.measurement.error("pr")
 } else {
   sem_pr <- 0
