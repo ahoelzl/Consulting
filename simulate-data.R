@@ -208,9 +208,9 @@ data.o.cov <- function() {
     print(lm(grades[,5] ~ all.scores4.theor + grades[,4]))
     
     if(length(vars.to.use) > 1) {
-    t1 <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[3,1]
-    t2 <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[3,1]
-    t3 <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[3,1]
+    t1 <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[2,1]
+    t2 <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[2,1]
+    t3 <- lm( all.scores4.theor  ~ all.scores3.theor + grades[,3])$coef[2,1]
     
     t1.auto <- lm( all.scores2.theor  ~ all.scores1.theor + grades[,1])$coef[2,1]
     t2.auto <- lm( all.scores3.theor  ~ all.scores2.theor + grades[,2])$coef[2,1]

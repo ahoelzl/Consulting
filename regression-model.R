@@ -105,9 +105,9 @@ simex.linear.model.sem2 <<- simex(model=linear.model2, SIMEXvariable=simex.var[1
   for(c in 3:length(simex.linear.model.alpha$coef)) {
     a <- c - 2
 
-    coefs.matrix.normal[use.emos[a],t] <- linear.model$coef[c]*sqrt(var.score[a])
-    coefs.matrix.simex.alpha[use.emos[a],t] <-simex.linear.model.alpha$coef[c]*sqrt(var.score[a])
-    coefs.matrix.simex.sem[use.emos[a],t]  <-simex.linear.model.sem$coef[c]*sqrt(var.score[a])
+    coefs.matrix.normal[use.emos[a],t] <- linear.model$coef[c]*sqrt(var.whole[a])
+    coefs.matrix.simex.alpha[use.emos[a],t] <-simex.linear.model.alpha$coef[c]*sqrt(var.whole[a])
+    coefs.matrix.simex.sem[use.emos[a],t]  <-simex.linear.model.sem$coef[c]*sqrt(var.whole[a])
     
     coefs.matrix.normal.auto[use.emos[a],t] <- linear.model$coef[2]
     coefs.matrix.simex.alpha.auto[use.emos[a],t] <-simex.linear.model.alpha$coef[2]
@@ -115,8 +115,9 @@ simex.linear.model.sem2 <<- simex(model=linear.model2, SIMEXvariable=simex.var[1
     
 
     
-    coefs.matrix2.normal[1,t] <- linear.model2$coef[3]
+    #[1,t] <- linear.model2$coef[3]
     coefs.matrix2.simex.alpha[1,t]  <- simex.linear.model.alpha2$coef[3]
+    coefs.matrix2.normal[1,t]  <- linear.model2$coef[3]
     coefs.matrix2.simex.sem[1,t]  <- simex.linear.model.sem2$coef[3]
     
     
@@ -133,13 +134,13 @@ simex.linear.model.sem2 <<- simex(model=linear.model2, SIMEXvariable=simex.var[1
 }
 
 
-colnames(coefs.matrix.normal) <- c("T1", "T2","T3","T4")
-colnames(coefs.matrix.simex.alpha) <- c("T1", "T2","T3","T4")
+#colnames(coefs.matrix.normal) <- c("T1", "T2","T3","T4")
+#colnames(coefs.matrix.simex.alpha) <- c("T1", "T2","T3","T4")
 #colnames(coefs.matrix.simex.sem) <- c("T1", "T2","T3","T4")
 #olnames(coefs.matrix.simex.fit) <- c("T1", "T2","T3","T4")
 
-rownames(coefs.matrix.normal) <- emos
-rownames(coefs.matrix.simex.alpha) <- emos
+#rownames(coefs.matrix.normal) <- emos
+#rownames(coefs.matrix.simex.alpha) <- emos
 #rownames(coefs.matrix.simex.sem) <- emos
 #rownames(coefs.matrix.simex.fit ) <- emos
   
@@ -154,7 +155,6 @@ rownames(coefs.matrix.simex.alpha) <- emos
   coefs.matrix2.normal <<- coefs.matrix2.normal
   
   coefs.matrix2.simex.sem <<-  coefs.matrix2.simex.sem
-  
   
   coefs.matrix2.normal.auto <<- coefs.matrix2.normal.auto
   coefs.matrix2.simex.alpha.auto <<- coefs.matrix2.simex.alpha.auto

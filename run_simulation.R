@@ -9,32 +9,11 @@ source("simple-model.R")
 
 
 
-svd <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = TRUE) 
-{
-  x <- as.matrix(x)
-  if (any(!is.finite(x))) 
-    stop("infinite or missing values in 'x'")
-  dx <- dim(x)
-  n <- dx[1L]
-  p <- dx[2L]
-  if (!n || !p) 
-    stop("a dimension is zero")
-  La.res <- La.svd(x, nu, nv)
-  res <- list(d = La.res$d)
-  if (nu) 
-    res$u <- La.res$u
-  if (nv) {
-    if (is.complex(x)) 
-      res$v <- Conj(t(La.res$vt))
-    else res$v <- t(La.res$vt)
-  }
-  res
-}
-
-assignInNamespace("svd", svd, "base") 
-
 
 data <- data2 <- data.o  <- as.data.frame(read.spss("PALMA_Crosslagged_all_emos_MPlus.sav", use.missings=99))
+
+
+
 emos <- c("jo","ax","ag","hl","bo","sh", "pr")
 get.sem.coeffs()
 
@@ -106,6 +85,10 @@ b.simex.alpha <- c()
 b.simex.sem <- c()
 b.sem <- c()  
 
+var.factor <- c(1)
+regression.error <- c(0.1)
+corre <- T
+
 for(s in 1:2) {
   varlist <- list()
   if(s == 1) {
@@ -120,15 +103,13 @@ for(s in 1:2) {
     varlist <- list.seven
   }
   
-  var.factor <- c(0.5,1,2)
-  regression.error <- c(0.1,0.2)
-  
+
   for(r.error in regression.error) {
-    
-    resultmatrix <- matrix(0, ncol=4, nrow=length(var.factor))
-    biasmatrix <-  matrix(0, ncol=4, nrow=length(var.factor))
+     
+   
     for(b2 in 1:length(var.factor)) {
-variance <- var.factor[b2]
+      
+      variance <- var.factor[b2]
       
       v.normal <- c()
       v.simex.alpha <- c()
@@ -140,12 +121,14 @@ variance <- var.factor[b2]
       b.simex.sem <- c()
       b.sem <- c()  
       
-resultmatrix <- matrix(0, nrow=4, ncol=length(varlist))
-biasmatrix <-  matrix(0, nrow=4, ncol=length(varlist))
+      resultmatrix <- matrix(0, ncol=4, nrow=4)
+      resultmatrix2 <- matrix(0, ncol=4, nrow=4)
+      biasmatrix <-  matrix(0, ncol=4, nrow=4)
+      biasmatrix2 <-  matrix(0, ncol=4, nrow=4)
 for(index in 1:length(varlist)) {
 vars <-varlist[[index]]
 
-data <- data2 <- simulate.data2(vars, measurement.corrs=F, var.factor=variance, regression.error = r.error) 
+data <- data2 <- simulate.data2(vars, measurement.corrs=corre, var.factor=variance, regression.error = r.error) 
 # true.error.scores 
 #actual_grades
 #actual_scores
@@ -171,34 +154,39 @@ get.lm.coeffs(vars)
 ##standardized.values.auto
 ###standardized.values2.auto
 if(s < 4) {
-#sem.one.variable(vars, correlation=F)
+sem.one.variable(vars, correlation=corre)
 }
 #coefs.matrix.sem
 #coefs.matrix.simex.fit
 
 
-diff.matrix.normal <- mean(abs(coefs.matrix.normal[vars,] - standardized.values))
-diff.matrix.simex.alpha <- mean(abs(coefs.matrix.simex.alpha[vars,] - standardized.values))
-diff.matrix.simex.sem <- mean(abs(coefs.matrix.simex.sem[vars,] - standardized.values))
-diff.matrix.sem <- mean(abs(coefs.matrix.sem[vars,] - standardized.values))
+diff.matrix.normal <- mean(abs(coefs.matrix.normal[vars,] - standardized.values)/abs(standardized.values))
+diff.matrix.simex.alpha <- mean(abs(coefs.matrix.simex.alpha[vars,] - standardized.values)/abs(standardized.values))
+diff.matrix.simex.sem <- mean(abs(coefs.matrix.simex.sem[vars,] - standardized.values)/abs(standardized.values))
+diff.matrix.sem <- mean(abs(coefs.matrix.sem[vars,] - standardized.values)/abs(standardized.values))
 
-diff2.normal <-     mean(abs(coefs.matrix2.normal[1,1:3] - standardized.values2))
-diff2.alpha <-   mean(abs(coefs.matrix2.simex.alpha[1,1:3]  - standardized.values2))
-diff2.sem <-   mean(abs(coefs.matrix2.simex.sem[1,1:3]  - standardized.values2))
+diff2.normal <-     mean(abs(coefs.matrix2.normal[1,1:3] - standardized.values2)/abs(standardized.values2))
+diff2.alpha <-   mean(abs(coefs.matrix2.simex.alpha[1,1:3]  - standardized.values2)/abs(standardized.values2))
+diff2.sem <-   mean(abs(coefs.matrix2.simex.sem[1,1:3]  - standardized.values2)/abs(standardized.values2))
 
-diff.normal.auto <- mean(abs(coefs.matrix.normal.auto[vars,] - standardized.values.auto))
+diff.normal.auto <- mean(abs(coefs.matrix.normal.auto[vars,] - standardized.values.auto)/abs(standardized.values.auto))
 #diff.alpha.auto <- mean(abs( coefs.matrix.alpha.auto[vars,] - standardized.values.auto))
-diff.sem.auto <- mean(abs( coefs.matrix.simex.sem.auto[vars,] - standardized.values.auto))
+diff.sem.auto <- mean(abs( coefs.matrix.simex.sem.auto[vars,] - standardized.values.auto)/abs(standardized.values.auto))
 
-diff2.normal.auto <- mean(abs(coefs.matrix2.normal.auto[1,1:3] - standardized.values2.auto))
-diff2.alpha.auto <- mean(abs( coefs.matrix2.simex.alpha.auto[1,1:3] - standardized.values2.auto))
-diff2.sem.auto <- mean(abs( coefs.matrix2.simex.sem.auto[1,1:3] - standardized.values2.auto))
+diff2.normal.auto <- mean(abs(coefs.matrix2.normal.auto[1,1:3] - standardized.values2.auto)/abs(standardized.values2.auto))
+diff2.alpha.auto <- mean(abs( coefs.matrix2.simex.alpha.auto[1,1:3] - standardized.values2.auto)/abs(standardized.values2.auto))
+diff2.sem.auto <- mean(abs( coefs.matrix2.simex.sem.auto[1,1:3] - standardized.values2.auto)/abs(standardized.values2.auto))
 
 
 bias.normal <- mean(abs(coefs.matrix.normal[vars,]) - abs( standardized.values))
 bias.simex.alpha <- mean(abs(coefs.matrix.simex.alpha[vars,]) - abs(standardized.values))
 bias.simex.sem <- mean(abs(coefs.matrix.simex.sem[vars,]) - abs( standardized.values))
 bias.matrix.sem <- mean(abs(coefs.matrix.sem[vars,]) - abs(standardized.values))
+
+
+bias2.normal <-     mean(abs(coefs.matrix2.normal[1,1:3]) - abs(standardized.values2))
+bias2.alpha <-   mean(abs(coefs.matrix2.simex.alpha[1,1:3])  - abs(standardized.values2))
+bias2.sem <-   mean(abs(coefs.matrix2.simex.sem[1,1:3])  - abs(standardized.values2))
 
 
 print("-------------")
@@ -230,8 +218,8 @@ print("-------------")
 v <- index
 
  v.normal[v] <- diff.matrix.normal
-v.simex.alpha[v] <- diff.matrix.simex.alpha
-v.simex.sem[v] <- diff.matrix.simex.sem 
+v.simex.alpha[v] <- diff2.alpha
+v.simex.sem[v] <- diff2.sem
 v.sem[v] <- diff.matrix.sem
 
 print(v.normal)
@@ -245,12 +233,119 @@ b.simex.alpha[v] <- bias.simex.alpha
 b.simex.sem[v] <- bias.simex.sem 
 b.sem[v] <- bias.matrix.sem
 
-resultmatrix[1, v] <- diff.matrix.normal
-resultmatrix[2, v] <-diff.matrix.simex.alpha
-resultmatrix[3, v] <-diff.matrix.simex.sem 
-resultmatrix[4, v] <-  diff.matrix.sem
 
-write.table(resultmatrix, file=paste0(getwd(),"/results/numberemos",s,"rerror",r.error," variance ", variance ))
+resultmatrix[v, 1] <- diff.matrix.normal
+resultmatrix[v, 2] <-diff.matrix.simex.alpha
+resultmatrix[v, 3] <-diff.matrix.simex.sem 
+resultmatrix[v, 4] <-  diff.matrix.sem
+
+
+resultmatrix2[v, 1] <- diff2.normal
+resultmatrix2[v, 2] <-diff2.alpha
+resultmatrix2[v, 3] <-diff.matrix.simex.sem 
+#resultmatrix2[4, v] <-  diff2.sem 
+
+
+biasmatrix[v, 1]  <- bias.normal 
+biasmatrix[v, 2]  <- bias.simex.alpha
+biasmatrix[v, 3]  <- bias.simex.sem 
+biasmatrix[v, 4]  <- bias.matrix.sem 
+
+biasmatrix2[v, 1]  <- bias2.normal 
+biasmatrix2[v, 2]  <- bias2.alpha
+biasmatrix2[v, 3]  <- bias2.sem 
+
+colnames(resultmatrix) <- colnames(resultmatrix2)<- colnames(biasmatrix) <- colnames(resultmatrix2) <- c("norm. Regression", "Simex-Alpha", "Simex-SEM", "SEM")  
+
+
+if(s==1) {
+  rownames(resultmatrix) <- rownames(resultmatrix2)<- rownames(biasmatrix) <- rownames(resultmatrix2) <- c("joy", "anxiety", "anger", "hopelessness")  
+} else if(s==2) {
+  rownames(resultmatrix) <- rownames(resultmatrix2)<- rownames(biasmatrix) <- rownames(resultmatrix2) <- c("joy,anxiety", "anger,hopelesness", "anger,boredom", "hopelessness,shame")
+}
+
+table <- tableGrob(resultmatrix)
+grid.newpage()
+h <-2* grobHeight(table)
+w <-2*grobWidth(table)
+
+
+title <- textGrob("Abweichung von wahren Parameterwerten des Einflusses der Emotionen auf die Note", y=unit(0.5,"npc") + 0.5*h, 
+                  vjust=0, gp=gpar(fontsize=20))
+
+footnote <- textGrob(paste0("bei Fehlervarianz ", variance, " mal so groß wie im Datensatz","   Regressionsfehler ", r.error," mal so groß wie erklärte Abweichung", " correlation ", corre), 
+                     x=unit(0.5,"npc") - 0.5*w,
+                     y=unit(0.5,"npc") - 0.5*h, 
+                     vjust=1, hjust=0,gp=gpar( fontface="italic"))
+
+jpeg(filename=paste0(getwd(),"/results/ongradesnumberemos",s,"rerror",r.error," variance ", variance ,"corr",corre,".jpeg"),width = 1000, height = 1000)
+gt <- gTree(children=gList(table, title, footnote))
+grid.draw(gt)
+dev.off()
+write.table(resultmatrix, file=paste0(getwd(),"/results/ongradesnumberemos",s,"rerror",r.error," variance ", variance ,"corr",corre))
+
+table <- tableGrob(biasmatrix)
+grid.newpage()
+h <-1* grobHeight(table)
+w <-1*grobWidth(table)
+
+
+title <- textGrob("Bias von wahren Parameterwerten des Einflusses der Emotionen auf die Note ", y=unit(0.5,"npc") + 0.5*h, 
+                  vjust=0, gp=gpar(fontsize=20))
+
+footnote <- textGrob(paste0("bei Fehlervarianz ", variance, " mal so groß wie im Datensatz","   Regressionsfehler ", r.error," mal so groß wie erklärte Abweichung", " correlation ", corre), 
+                     x=unit(0.5,"npc") + 1*w,
+                     y=unit(0.5,"npc") - 0.5*h, 
+                     vjust=1, hjust=1,gp=gpar( fontface="italic"))
+
+jpeg(filename=paste0(getwd(),"/results/biasongradesnumberemos",s,"rerror",r.error," variance ", variance ,"corr",corre,".jpeg"),width = 1000, height = 1000)
+gt <- gTree(children=gList(table, title, footnote))
+grid.draw(gt)
+dev.off()
+write.table(biasmatrix, file=paste0(getwd(),"/results/biasongradessnumberemos",s,"rerror",r.error," variance ", variance,"corr",corre ))
+
+table <- tableGrob(resultmatrix2)
+grid.newpage()
+h <-1.5* grobHeight(table)
+w <-1.5*grobWidth(table)
+
+
+title <- textGrob("Abweichung von wahren Parameterwerten der Note auf die erste Emotion ", y=unit(0.5,"npc") + 0.5*h, 
+                  vjust=0, gp=gpar(fontsize=20))
+
+footnote <- textGrob(paste0("bei Fehlervarianz ", variance, " mal so groß wie im Datensatz","   Regressionsfehler ", r.error," mal so groß wie erklärte Abweichung", " correlation ", corre), 
+                     x=unit(0.5,"npc") - 0.5*w,
+                     y=unit(0.5,"npc") - 0.5*h, 
+                     vjust=1, hjust=0,gp=gpar( fontface="italic"))
+
+jpeg(filename=paste0(getwd(),"/results/onemotionsnumberemos",s,"rerror",r.error," variance ", variance,"corr",corre,".jpeg" ) ,width = 1000, height = 1000)
+gt <- gTree(children=gList(table, title, footnote))
+grid.draw(gt)
+dev.off()
+write.table(resultmatrix2, file=paste0(getwd(),"/results/onemotionsnumberemos",s,"rerror",r.error," variance ", variance,"corr",corre ))
+
+
+
+
+table <- tableGrob(biasmatrix2)
+grid.newpage()
+h <-1.5* grobHeight(table)
+w <-1.5*grobWidth(table)
+
+title <- textGrob("Bias vom Einfluss der wahren Parameterwerten der Note auf die erste Emotion ", y=unit(0.5,"npc") + 0.5*h, 
+                  vjust=0, gp=gpar(fontsize=20))
+
+footnote <- textGrob(paste0("bei Fehlervarianz ", variance, " mal so groß wie im Datensatz","   Regressionsfehler ", r.error," mal so groß wie erklärte Abweichung", " correlation ", corre), 
+                     x=unit(0.5,"npc") - 0.5*w,
+                     y=unit(0.5,"npc") - 0.5*h, 
+                     vjust=1, hjust=0,gp=gpar( fontface="italic"))
+jpeg(filename=paste0(getwd(),"/results/biasonemotionsnumberemos",s,"rerror",r.error," variance ", variance,"corr",corre,".jpeg" ),width = 1000, height = 1000)
+gt <- gTree(children=gList(table, title, footnote))
+grid.draw(gt)
+dev.off()
+
+
+write.table(biasmatrix2, file=paste0(getwd(),"/results/biasonemotionsnumberemos",s,"rerror",r.error," variance ", variance,"corr",corre ))
 
 }
       
