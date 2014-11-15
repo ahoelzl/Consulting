@@ -2,15 +2,19 @@ library(Hmisc)
 library(lavaan)
 library(MASS)
 library(foreign)
+library(gridExtra)
 source("simulation-types.R")
-source("SEM.R")
+source("SEM-model.R")
 source("simulate-data.R")
-source("simple-model.R")
+source("regression-model.R")
+
+###Änderungen:
+###eine Emotion wird weggelassen bei Simulation
+### 
+###
 
 
-
-
-data <- data2 <- data.o  <- as.data.frame(read.spss("PALMA_Crosslagged_all_emos_MPlus.sav", use.missings=99))
+data <- data2 <- data.o  <- as.data.frame(read.spss("PALMA Crosslagged_all_emos_MPlus.sav", use.missings=99))
 
 
 
@@ -38,7 +42,7 @@ para.list[[2]] <- c(5,6,2)
 para.list[[3]] <- c(1,2,4)
 para.list[[4]] <- c(3,6,7)
 
-theoretical.coeffs <- theoretical.values
+#theoretical.coeffs <- theoretical.values
 
 library(Hmisc)
 library(simex)
@@ -85,11 +89,13 @@ b.simex.alpha <- c()
 b.simex.sem <- c()
 b.sem <- c()  
 
-var.factor <- c(1)
-regression.error <- c(0.1)
-corre <- T
 
-for(s in 1:2) {
+
+var.factor <- c(1)
+regression.error <- c(0.2)
+corre <- F
+
+for(s in 2:2) {
   varlist <- list()
   if(s == 1) {
     varlist <- list.one
@@ -126,9 +132,13 @@ for(s in 1:2) {
       biasmatrix <-  matrix(0, ncol=4, nrow=4)
       biasmatrix2 <-  matrix(0, ncol=4, nrow=4)
 for(index in 1:length(varlist)) {
-vars <-varlist[[index]]
 
-data <- data2 <- simulate.data2(vars, measurement.corrs=corre, var.factor=variance, regression.error = r.error) 
+#vars <- c(1,2,3,4,5,6,7)
+#data <- data2 <- simulate.data2(vars, measurement.corrs=corre, var.factor=variance, regression.error = r.error) 
+#source("measurementError.R")
+
+vars <-varlist[[index]]
+data <- data2 <- simulate.data2(vars, measurement.corrs=corre, var.factor=variance, regression.error = r.error, is.zero=c()) 
 # true.error.scores 
 #actual_grades
 #actual_scores
@@ -156,7 +166,8 @@ get.lm.coeffs(vars)
 if(s < 4) {
 sem.one.variable(vars, correlation=corre)
 }
-#coefs.matrix.sem
+#
+
 #coefs.matrix.simex.fit
 
 
@@ -200,19 +211,27 @@ print(diff2.normal)
 print(diff2.alpha)
 print(diff2.sem)
 
-print(diff.normal.auto)
+#print(diff.normal.auto)
 #print(diff.alpha.auto)
-print(diff.sem.auto)
+#print(diff.sem.auto)
 
-print(diff2.normal.auto)
+#print(diff2.normal.auto)
 #print(diff2.alpha.auto)
-print(diff2.sem.auto)
+#print(diff2.sem.auto)
 
 print(bias.normal)
 print(bias.simex.alpha)
 print(bias.simex.sem)
 print(bias.matrix.sem)
 print("-------------")
+
+
+
+print(bias2.normal)
+print(bias2.alpha)
+print(bias2.sem)
+print("-------------")
+
 
 
 v <- index
@@ -242,7 +261,7 @@ resultmatrix[v, 4] <-  diff.matrix.sem
 
 resultmatrix2[v, 1] <- diff2.normal
 resultmatrix2[v, 2] <-diff2.alpha
-resultmatrix2[v, 3] <-diff.matrix.simex.sem 
+resultmatrix2[v, 3] <-diff2.sem
 #resultmatrix2[4, v] <-  diff2.sem 
 
 

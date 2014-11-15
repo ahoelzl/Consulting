@@ -37,9 +37,9 @@ read.data.measurement.error <- function(emotion) {
     #print(summary(is.na(one.time.data.frame)))
     calpha <-  as.numeric(alpha(numbers)$total[1])
     
-    
+  
     sumscore <<- apply(numbers, MARGIN=1, FUN=sum)
-    sd <- sd(sumscore)
+    sd <- sd(na.omit(sumscore))
     
     sem <- sd * sqrt(1 - calpha)
     m.errors[i] <- sem
